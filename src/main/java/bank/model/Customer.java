@@ -14,13 +14,12 @@ public class Customer implements Serializable {
     private String username;
     private String password;
     private String email;
-    private String employmentStatus;
-    private String companyName;
-    private String companyAddress;
     private List<Account> accounts;
+    protected String customerType;
+  
 
-    public Customer(String customerId, String firstName, String surname, String address,
-                    String username, String password, String email) {
+  public Customer(String customerId, String firstName, String surname, String address,
+                    String username, String password, String email, String customerType) {
 
         
         this.customerId = customerId;
@@ -31,14 +30,11 @@ public class Customer implements Serializable {
         this.password = password != null ? password : "";
         this.email = email != null ? email : "";
         this.accounts = new ArrayList<>();
-        this.employmentStatus = null;
-        this.companyName = null;
-        this.companyAddress = null;
+        this.customerType = customerType;
+        
 
-        System.out.println("Customer object created - ID: " + customerId + ", Username: " + username);
+      System.out.println("Customer object created - ID: " + customerId + ", Type: " + customerType + ", Username: " + username);
     }
-
-    
     public String getCustomerId() { return customerId; }
     public String getFirstName() { return firstName; }
     public String getSurname() { return surname; }
@@ -46,19 +42,17 @@ public class Customer implements Serializable {
     public String getUsername() { return username; }
     public String getPassword() { return password; }
     public String getEmail() { return email; }
-    public String getEmploymentStatus() { return employmentStatus; }
-    public void setEmploymentStatus(String employmentStatus) { this.employmentStatus = employmentStatus; }
-    public String getCompanyName() { return companyName; }
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
-    public String getCompanyAddress() { return companyAddress; }
-    public void setCompanyAddress(String companyAddress) { this.companyAddress = companyAddress; }
+    public String getCustomerType() { return customerType; }
     public List<Account> getAccounts() { return accounts; }
-    public void addAccount(Account account) {
+
+     public void addAccount(Account account) {
         accounts.add(account);
         System.out.println("Account added to customer " + username + ": " + account.getAccountNumber());
     }
-
+  
     public String getFullName() {
         return firstName + " " + surname;
     }
+     public abstract String getDisplayInfo();
+
 }
