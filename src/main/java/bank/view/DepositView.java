@@ -204,7 +204,7 @@ public class DepositView {
         successLabel.setAlignment(Pos.CENTER);
         successLabel.setMaxWidth(Double.MAX_VALUE);
 
-        // Buttons
+        
         HBox buttonBox = new HBox(15);
         buttonBox.setAlignment(Pos.CENTER);
 
@@ -277,7 +277,7 @@ public class DepositView {
                 amountField.clear();
                 updateBalanceDisplay();
 
-                // Refresh account list to get updated balances
+                
                 loadAccounts();
             } else {
                 showError("❌ Deposit failed");
