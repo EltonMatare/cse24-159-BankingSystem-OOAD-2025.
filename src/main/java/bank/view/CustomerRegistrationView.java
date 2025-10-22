@@ -1,6 +1,7 @@
 package bank.view;
 
 import bank.controller.LoginController;
+import bank.controller.AccountController;
 import bank.model.Customer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,8 +15,13 @@ import javafx.scene.text.FontWeight;
 public class CustomerRegistrationView {
     private Scene scene;
     private LoginController loginController;
+    private AccountController accountController;
     private Runnable onRegistrationSuccess;
     private Runnable onShowLogin;
+    
+    private ToggleGroup customerTypeGroup;
+    private RadioButton individualRadio;
+    private RadioButton companyRadio;
 
     private TextField firstNameField;
     private TextField surnameField;
@@ -24,30 +30,42 @@ public class CustomerRegistrationView {
     private TextField emailField;
     private PasswordField passwordField;
     private PasswordField confirmPasswordField;
-    private ComboBox<String> employmentCombo;
-    private ComboBox<String> branchCombo; 
-    private TextField companyNameField;
-    private TextArea companyAddressField;
-    private Label errorLabel;
 
-    public CustomerRegistrationView(LoginController loginController,
+    private TextField idNumberField;
+    private ComboBox<String> occupationCombo;
+    private ComboBox<String> employmentCombo;
+
+    private TextField registrationNumberField;
+    private ComboBox<String> businessTypeCombo;
+    private TextField contactPersonField;
+    private ComboBox<String> companySizeCombo;
+
+    private ComboBox<String> accountTypeCombo;
+    private ComboBox<String> branchCombo;
+    private TextField initialDepositField;
+
+    private Label errorLabel;
+    private Label successLabel;
+    private VBox individualDetailsContainer;
+    private VBox companyDetailsContainer;
+    private VBox accountCreationContainer;
+
+     public CustomerRegistrationView(LoginController loginController, AccountController accountController,
                                     Runnable onRegistrationSuccess, Runnable onShowLogin) {
         this.loginController = loginController;
+        this.accountController = accountController;
         this.onRegistrationSuccess = onRegistrationSuccess;
         this.onShowLogin = onShowLogin;
         createView();
     }
 
     private void createView() {
-        
         BorderPane mainLayout = new BorderPane();
         mainLayout.setStyle("-fx-background-color: #f7fafc;");
 
-        
         VBox leftSection = createLeftSection();
         mainLayout.setLeft(leftSection);
 
-        
         VBox rightSection = createRightSection();
         mainLayout.setCenter(rightSection);
 
@@ -61,7 +79,6 @@ public class CustomerRegistrationView {
         leftSection.setPrefWidth(400);
         leftSection.setStyle("-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-width: 0 1px 0 0;");
 
-        
         VBox logoContainer = new VBox(10);
         logoContainer.setAlignment(Pos.CENTER);
 
@@ -78,22 +95,20 @@ public class CustomerRegistrationView {
 
         logoContainer.getChildren().addAll(bankLogo, bankName, bankTagline);
 
-        
         VBox featuresContainer = new VBox(15);
         featuresContainer.setAlignment(Pos.CENTER_LEFT);
 
-        Label featuresTitle = new Label("Create Your Account");
+        Label featuresTitle = new Label("Account Types Available");
         featuresTitle.setFont(Font.font("System", FontWeight.BOLD, 18));
         featuresTitle.setTextFill(Color.web("#2D3748"));
 
         VBox featureList = new VBox(10);
 
-        Label feature1 = createFeatureItem("👤", "Personal & Business Accounts");
-        Label feature2 = createFeatureItem("🏢", "Multiple Branch Locations");
-        Label feature3 = createFeatureItem("💳", "Instant Account Number");
-        Label feature4 = createFeatureItem("🔒", "Secure Registration Process");
+        Label feature1 = createFeatureItem("💰", "Savings Account - 0.05% monthly interest");
+        Label feature2 = createFeatureItem("📈", "Investment Account - 5% monthly interest");
+        Label feature3 = createFeatureItem("💳", "Cheque Account - Salary deposits");
 
-        featureList.getChildren().addAll(feature1, feature2, feature3, feature4);
+        featureList.getChildren().addAll(feature1, feature2, feature3);
         featuresContainer.getChildren().addAll(featuresTitle, featureList);
 
         leftSection.getChildren().addAll(logoContainer, new Separator(), featuresContainer);
@@ -127,12 +142,10 @@ public class CustomerRegistrationView {
         rightSection.setPadding(new Insets(40));
         rightSection.setMaxWidth(600);
 
-        
         Label titleLabel = new Label("Register New Account");
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 28));
         titleLabel.setTextFill(Color.web("#2D3748"));
 
-       
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setPrefViewportHeight(500);
@@ -142,16 +155,37 @@ public class CustomerRegistrationView {
         formContainer.setMaxWidth(550);
 
        
-        Label personalSection = new Label("Personal Information");
-        personalSection.setFont(Font.font("System", FontWeight.BOLD, 18));
+        VBox customerTypeSection = new VBox(10);
+        Label customerTypeLabel = new Label("Customer Type *");
+        customerTypeLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
+
+        customerTypeGroup = new ToggleGroup();
+        individualRadio = new RadioButton("Individual Customer");
+        companyRadio = new RadioButton("Company Customer");
+        individualRadio.setToggleGroup(customerTypeGroup);
+        companyRadio.setToggleGroup(customerTypeGroup);
+        individualRadio.setSelected(true);
+
+        HBox radioBox = new HBox(20);
+        radioBox.getChildren().addAll(individualRadio, companyRadio);
+
+        customerTypeGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
+            toggleCustomerTypeFields();
+        });
+
+        customerTypeSection.getChildren().addAll(customerTypeLabel, radioBox);
 
         
+        VBox personalSection = new VBox(10);
+        Label personalLabel = new Label("Personal Information");
+        personalLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
+
         HBox nameBox = new HBox(15);
         VBox firstNameBox = new VBox(5);
         Label firstNameLabel = new Label("First Name *");
         firstNameLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         firstNameField = new TextField();
-        firstNameField.setPromptText("Enter your first name");
+        firstNameField.setPromptText("Enter first name");
         firstNameField.setStyle("-fx-pref-height: 40px; -fx-padding: 0 12px; -fx-background-color: white; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-font-size: 14px;");
         firstNameBox.getChildren().addAll(firstNameLabel, firstNameField);
 
@@ -159,13 +193,12 @@ public class CustomerRegistrationView {
         Label surnameLabel = new Label("Surname *");
         surnameLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         surnameField = new TextField();
-        surnameField.setPromptText("Enter your surname");
+        surnameField.setPromptText("Enter surname");
         surnameField.setStyle("-fx-pref-height: 40px; -fx-padding: 0 12px; -fx-background-color: white; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-font-size: 14px;");
         surnameBox.getChildren().addAll(surnameLabel, surnameField);
 
         nameBox.getChildren().addAll(firstNameBox, surnameBox);
 
-        // Address
         VBox addressBox = new VBox(5);
         Label addressLabel = new Label("Address *");
         addressLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
@@ -175,9 +208,99 @@ public class CustomerRegistrationView {
         addressField.setStyle("-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-padding: 8px 12px;");
         addressBox.getChildren().addAll(addressLabel, addressField);
 
-        // Branch Selection 
+        personalSection.getChildren().addAll(personalLabel, nameBox, addressBox);
+
+       
+        individualDetailsContainer = new VBox(10);
+        Label individualLabel = new Label("Individual Details");
+        individualLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+
+        VBox idNumberBox = new VBox(5);
+        Label idNumberLabel = new Label("ID Number *");
+        idNumberLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        idNumberField = new TextField();
+        idNumberField.setPromptText("Enter national ID number");
+        idNumberField.setStyle("-fx-pref-height: 40px; -fx-padding: 0 12px; -fx-background-color: white; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-font-size: 14px;");
+        idNumberBox.getChildren().addAll(idNumberLabel, idNumberField);
+
+        VBox occupationBox = new VBox(5);
+        Label occupationLabel = new Label("Occupation");
+        occupationLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        occupationCombo = new ComboBox<>();
+        occupationCombo.getItems().addAll("Select Occupation", "Student", "Employed", "Self-Employed", "Retired", "Other");
+        occupationCombo.setValue("Select Occupation");
+        occupationCombo.setStyle("-fx-pref-height: 40px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;");
+        occupationBox.getChildren().addAll(occupationLabel, occupationCombo);
+
+        VBox employmentBox = new VBox(5);
+        Label employmentLabel = new Label("Employment Status");
+        employmentLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        employmentCombo = new ComboBox<>();
+        employmentCombo.getItems().addAll("Select Status", "Full-time", "Part-time", "Contract", "Unemployed");
+        employmentCombo.setValue("Select Status");
+        employmentCombo.setStyle("-fx-pref-height: 40px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;");
+        employmentBox.getChildren().addAll(employmentLabel, employmentCombo);
+
+        individualDetailsContainer.getChildren().addAll(individualLabel, idNumberBox, occupationBox, employmentBox);
+
+        
+        companyDetailsContainer = new VBox(10);
+        companyDetailsContainer.setVisible(false);
+        Label companyLabel = new Label("Company Details");
+        companyLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+
+        VBox regNumberBox = new VBox(5);
+        Label regNumberLabel = new Label("Registration Number *");
+        regNumberLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        registrationNumberField = new TextField();
+        registrationNumberField.setPromptText("Enter company registration number");
+        registrationNumberField.setStyle("-fx-pref-height: 40px; -fx-padding: 0 12px; -fx-background-color: white; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-font-size: 14px;");
+        regNumberBox.getChildren().addAll(regNumberLabel, registrationNumberField);
+
+        VBox businessTypeBox = new VBox(5);
+        Label businessTypeLabel = new Label("Business Type");
+        businessTypeLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        businessTypeCombo = new ComboBox<>();
+        businessTypeCombo.getItems().addAll("Select Business Type", "Retail", "Manufacturing", "Services", "Technology", "Finance", "Other");
+        businessTypeCombo.setValue("Select Business Type");
+        businessTypeCombo.setStyle("-fx-pref-height: 40px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;");
+        businessTypeBox.getChildren().addAll(businessTypeLabel, businessTypeCombo);
+
+        VBox contactPersonBox = new VBox(5);
+        Label contactPersonLabel = new Label("Contact Person");
+        contactPersonLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        contactPersonField = new TextField();
+        contactPersonField.setPromptText("Enter contact person name");
+        contactPersonField.setStyle("-fx-pref-height: 40px; -fx-padding: 0 12px; -fx-background-color: white; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-font-size: 14px;");
+        contactPersonBox.getChildren().addAll(contactPersonLabel, contactPersonField);
+
+        VBox companySizeBox = new VBox(5);
+        Label companySizeLabel = new Label("Company Size");
+        companySizeLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        companySizeCombo = new ComboBox<>();
+        companySizeCombo.getItems().addAll("Select Size", "Small (1-50)", "Medium (51-200)", "Large (201-1000)", "Enterprise (1000+)");
+        companySizeCombo.setValue("Select Size");
+        companySizeCombo.setStyle("-fx-pref-height: 40px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;");
+        companySizeBox.getChildren().addAll(companySizeLabel, companySizeCombo);
+
+        companyDetailsContainer.getChildren().addAll(companyLabel, regNumberBox, businessTypeBox, contactPersonBox, companySizeBox);
+
+        
+        accountCreationContainer = new VBox(10);
+        Label accountLabel = new Label("Create Your First Account *");
+        accountLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
+
+        VBox accountTypeBox = new VBox(5);
+        Label accountTypeLabel = new Label("Account Type *");
+        accountTypeLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        accountTypeCombo = new ComboBox<>();
+        accountTypeCombo.getItems().addAll("Savings Account", "Investment Account", "Cheque Account");
+        accountTypeCombo.setValue("Savings Account");
+        accountTypeCombo.setStyle("-fx-pref-height: 40px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;");
+        accountTypeBox.getChildren().addAll(accountTypeLabel, accountTypeCombo);
+
         VBox branchBox = new VBox(5);
-        Label branchLabel = new Label("Preferred Branch *");
+        Label branchLabel = new Label("Branch *");
         branchLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         branchCombo = new ComboBox<>();
         branchCombo.getItems().addAll("Main Branch - Gaborone", "Francistown Branch", "Maun Branch", "Palapye Branch", "Serowe Branch");
@@ -185,9 +308,20 @@ public class CustomerRegistrationView {
         branchCombo.setStyle("-fx-pref-height: 40px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;");
         branchBox.getChildren().addAll(branchLabel, branchCombo);
 
-        // Login Information Section
-        Label loginSection = new Label("Login Information");
-        loginSection.setFont(Font.font("System", FontWeight.BOLD, 18));
+        VBox depositBox = new VBox(5);
+        Label depositLabel = new Label("Initial Deposit *");
+        depositLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        initialDepositField = new TextField();
+        initialDepositField.setPromptText("Enter initial deposit amount");
+        initialDepositField.setStyle("-fx-pref-height: 40px; -fx-padding: 0 12px; -fx-background-color: white; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-font-size: 14px;");
+        depositBox.getChildren().addAll(depositLabel, initialDepositField);
+
+        accountCreationContainer.getChildren().addAll(accountLabel, accountTypeBox, branchBox, depositBox);
+
+        
+        VBox loginSection = new VBox(10);
+        Label loginLabel = new Label("Login Information");
+        loginLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
 
         VBox usernameBox = new VBox(5);
         Label usernameLabel = new Label("Username *");
@@ -198,7 +332,7 @@ public class CustomerRegistrationView {
         usernameBox.getChildren().addAll(usernameLabel, usernameField);
 
         VBox emailBox = new VBox(5);
-        Label emailLabel = new Label("Email Address *");
+        Label emailLabel = new Label("Email Address");
         emailLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         emailField = new TextField();
         emailField.setPromptText("Enter your email");
@@ -223,52 +357,24 @@ public class CustomerRegistrationView {
         confirmPasswordBox.getChildren().addAll(confirmPasswordLabel, confirmPasswordField);
 
         passwordBox.getChildren().addAll(passwordFieldBox, confirmPasswordBox);
+        loginSection.getChildren().addAll(loginLabel, usernameBox, emailBox, passwordBox);
 
-        // Employment Section
-        Label employmentSection = new Label("Employment Information");
-        employmentSection.setFont(Font.font("System", FontWeight.BOLD, 18));
-
-        VBox employmentBox = new VBox(5);
-        Label employmentLabel = new Label("Employment Status");
-        employmentLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-        employmentCombo = new ComboBox<>();
-        employmentCombo.getItems().addAll("Select Employment Status", "Employed", "Self-Employed", "Student", "Other");
-        employmentCombo.setValue("Select Employment Status");
-        employmentCombo.valueProperty().addListener((obs, oldVal, newVal) -> toggleEmploymentFields());
-        employmentCombo.setStyle("-fx-pref-height: 40px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;");
-        employmentBox.getChildren().addAll(employmentLabel, employmentCombo);
-
-        // Employment details 
-        VBox companyNameBox = new VBox(5);
-        Label companyNameLabel = new Label("Company Name");
-        companyNameLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-        companyNameField = new TextField();
-        companyNameField.setPromptText("Enter company name");
-        companyNameField.setStyle("-fx-pref-height: 40px; -fx-padding: 0 12px; -fx-background-color: white; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-font-size: 14px;");
-        companyNameBox.getChildren().addAll(companyNameLabel, companyNameField);
-        companyNameBox.setVisible(false);
-
-        VBox companyAddressBox = new VBox(5);
-        Label companyAddressLabel = new Label("Company Address");
-        companyAddressLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-        companyAddressField = new TextArea();
-        companyAddressField.setPromptText("Enter company address");
-        companyAddressField.setPrefRowCount(2);
-        companyAddressField.setStyle("-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-padding: 8px 12px;");
-        companyAddressBox.getChildren().addAll(companyAddressLabel, companyAddressField);
-        companyAddressBox.setVisible(false);
-
-        // Error label
+        
         errorLabel = new Label();
         errorLabel.setTextFill(Color.RED);
         errorLabel.setVisible(false);
         errorLabel.setWrapText(true);
 
-        // Buttons
+        successLabel = new Label();
+        successLabel.setTextFill(Color.GREEN);
+        successLabel.setVisible(false);
+        successLabel.setWrapText(true);
+
+        
         HBox buttonBox = new HBox(15);
         buttonBox.setAlignment(Pos.CENTER);
 
-        Button registerButton = new Button("Register Account");
+        Button registerButton = new Button("Complete Registration");
         registerButton.setStyle("-fx-pref-height: 50px; -fx-min-width: 200px; -fx-background-color: #667eea; -fx-background-radius: 8px; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-cursor: hand;");
         registerButton.setOnAction(e -> handleRegistration());
 
@@ -278,7 +384,7 @@ public class CustomerRegistrationView {
 
         buttonBox.getChildren().addAll(registerButton, cancelButton);
 
-        // Login link
+        
         HBox loginBox = new HBox(5);
         loginBox.setAlignment(Pos.CENTER);
         Label loginText = new Label("Already have an account?");
@@ -290,12 +396,10 @@ public class CustomerRegistrationView {
         loginBox.getChildren().addAll(loginText, loginLink);
 
         formContainer.getChildren().addAll(
-                personalSection, nameBox, addressBox, branchBox,
-                new Separator(),
-                loginSection, usernameBox, emailBox, passwordBox,
-                new Separator(),
-                employmentSection, employmentBox, companyNameBox, companyAddressBox,
-                errorLabel, buttonBox, loginBox
+                customerTypeSection, personalSection,
+                individualDetailsContainer, companyDetailsContainer,
+                accountCreationContainer, loginSection,
+                errorLabel, successLabel, buttonBox, loginBox
         );
 
         scrollPane.setContent(formContainer);
@@ -304,35 +408,17 @@ public class CustomerRegistrationView {
         return rightSection;
     }
 
-    private void toggleEmploymentFields() {
-        String employmentStatus = employmentCombo.getValue();
-        boolean showEmploymentFields = "Employed".equals(employmentStatus) || "Self-Employed".equals(employmentStatus);
-
-        companyNameField.setVisible(showEmploymentFields);
-        companyAddressField.setVisible(showEmploymentFields);
-
-
-        for (var node : ((VBox) ((ScrollPane) ((VBox) scene.getRoot().getChildrenUnmodifiable().get(1)).getChildren().get(1)).getContent()).getChildren()) {
-            if (node instanceof VBox) {
-                VBox vbox = (VBox) node;
-                if (!vbox.getChildren().isEmpty() && vbox.getChildren().get(0) instanceof Label) {
-                    Label label = (Label) vbox.getChildren().get(0);
-                    if ("Company Name".equals(label.getText())) {
-                        vbox.setVisible(showEmploymentFields);
-                    } else if ("Company Address".equals(label.getText())) {
-                        vbox.setVisible(showEmploymentFields);
-                    }
-                }
-            }
-        }
+    private void toggleCustomerTypeFields() {
+        boolean isIndividual = individualRadio.isSelected();
+        individualDetailsContainer.setVisible(isIndividual);
+        companyDetailsContainer.setVisible(!isIndividual);
     }
 
     private void handleRegistration() {
-        // Validation
+       
         if (firstNameField.getText().isEmpty() || surnameField.getText().isEmpty() ||
                 addressField.getText().isEmpty() || usernameField.getText().isEmpty() ||
-                emailField.getText().isEmpty() || passwordField.getText().isEmpty() ||
-                branchCombo.getValue() == null) {
+                passwordField.getText().isEmpty() || initialDepositField.getText().isEmpty()) {
             showError("Please fill in all required fields");
             return;
         }
@@ -348,44 +434,96 @@ public class CustomerRegistrationView {
         }
 
         try {
-            String employmentStatus = employmentCombo.getValue();
-            String companyName = null;
-            String companyAddress = null;
-
-            if ("Employed".equals(employmentStatus) || "Self-Employed".equals(employmentStatus)) {
-                companyName = companyNameField.getText();
-                companyAddress = companyAddressField.getText();
-
-                if (companyName.isEmpty() || companyAddress.isEmpty()) {
-                    showError("Please fill in company details for employed/self-employed status");
-                    return;
-                }
+            double initialDeposit = Double.parseDouble(initialDepositField.getText());
+            if (initialDeposit <= 0) {
+                showError("Initial deposit must be greater than 0");
+                return;
             }
 
-
             String branch = branchCombo.getValue().split(" - ")[0];
+            String accountType = accountTypeCombo.getValue();
 
-            System.out.println("Attempting to register customer: " + usernameField.getText() + " at branch: " + branch);
+           
+            if ("Investment Account".equals(accountType) && initialDeposit < 500) {
+                showError("Investment account requires minimum P 500.00 opening deposit");
+                return;
+            }
 
-            Customer customer = loginController.register(
-                    firstNameField.getText(),
-                    surnameField.getText(),
-                    addressField.getText(),
-                    usernameField.getText(),
-                    passwordField.getText(),
-                    emailField.getText(),
-                    employmentStatus,
-                    companyName,
-                    companyAddress
-            );
+            Customer customer;
+            boolean isIndividual = individualRadio.isSelected();
+
+            if (isIndividual) {
+                // Individual customer validation
+                if (idNumberField.getText().isEmpty()) {
+                    showError("ID Number is required for individual customers");
+                    return;
+                }
+
+                customer = loginController.registerIndividual(
+                        firstNameField.getText(),
+                        surnameField.getText(),
+                        addressField.getText(),
+                        usernameField.getText(),
+                        passwordField.getText(),
+                        emailField.getText(),
+                        idNumberField.getText(),
+                        occupationCombo.getValue(),
+                        employmentCombo.getValue()
+                );
+            } else {
+                
+                if (registrationNumberField.getText().isEmpty()) {
+                    showError("Registration Number is required for company customers");
+                    return;
+                }
+
+                customer = loginController.registerCompany(
+                        firstNameField.getText(),
+                        surnameField.getText(),
+                        addressField.getText(),
+                        usernameField.getText(),
+                        passwordField.getText(),
+                        emailField.getText(),
+                        registrationNumberField.getText(),
+                        businessTypeCombo.getValue(),
+                        contactPersonField.getText(),
+                        companySizeCombo.getValue()
+                );
+            }
 
             if (customer != null) {
-                System.out.println("Registration successful! Navigating to dashboard...");
-                onRegistrationSuccess.run();
+               
+                boolean accountCreated = accountController.createAccountDuringRegistration(customer, accountType, initialDeposit, branch);
+                if (accountCreated) {
+                    showSuccess("✅ Registration successful! Account created: " + accountType + " with initial deposit: P " + initialDeposit);
+                    System.out.println("✅ Registration and account creation successful! Navigating to dashboard...");
+
+                    
+                    loginController.setCurrentCustomer(customer);
+
+                   
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(2000); 
+                            javafx.application.Platform.runLater(() -> {
+                                onRegistrationSuccess.run();
+                            });
+                        } catch (InterruptedException e) {
+                            javafx.application.Platform.runLater(() -> {
+                                onRegistrationSuccess.run();
+                            });
+                        }
+                    }).start();
+                } else {
+                    showError("❌ Registration failed: Could not create account. Please try again.");
+                    System.err.println("❌ ACCOUNT CREATION FAILED for customer: " + customer.getUsername());
+                }
             } else {
                 showError("Registration failed - please try again");
             }
 
+        } catch (NumberFormatException e) {
+            showError("Please enter a valid numeric amount for initial deposit");
         } catch (IllegalArgumentException e) {
             showError(e.getMessage());
         } catch (Exception e) {
@@ -397,6 +535,13 @@ public class CustomerRegistrationView {
     private void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
+        successLabel.setVisible(false);
+    }
+
+    private void showSuccess(String message) {
+        successLabel.setText(message);
+        successLabel.setVisible(true);
+        errorLabel.setVisible(false);
     }
 
     public Scene getScene() {
@@ -404,6 +549,7 @@ public class CustomerRegistrationView {
     }
 
     public void clearForm() {
+        
         firstNameField.clear();
         surnameField.clear();
         addressField.clear();
@@ -411,11 +557,27 @@ public class CustomerRegistrationView {
         emailField.clear();
         passwordField.clear();
         confirmPasswordField.clear();
-        employmentCombo.setValue("Select Employment Status");
+        idNumberField.clear();
+        registrationNumberField.clear();
+        contactPersonField.clear();
+        initialDepositField.clear();
+
+       
+        occupationCombo.setValue("Select Occupation");
+        employmentCombo.setValue("Select Status");
+        businessTypeCombo.setValue("Select Business Type");
+        companySizeCombo.setValue("Select Size");
+        accountTypeCombo.setValue("Savings Account");
         branchCombo.setValue("Main Branch - Gaborone");
-        companyNameField.clear();
-        companyAddressField.clear();
+
+        
+        individualRadio.setSelected(true);
+        toggleCustomerTypeFields();
+
         errorLabel.setVisible(false);
-        toggleEmploymentFields();
+        successLabel.setVisible(false);
     }
 }
+    
+
+   
