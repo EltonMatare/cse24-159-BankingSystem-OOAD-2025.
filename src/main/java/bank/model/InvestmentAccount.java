@@ -10,6 +10,10 @@ public class InvestmentAccount extends Account implements InterestBearing, Seria
     public InvestmentAccount(String accountNumber, String branch, Customer owner, double balance) {
         super(accountNumber, branch, owner, balance, "INVESTMENT");
     }
+    
+    public InvestmentAccount(String accountNumber, String branch, Customer owner, double balance, Bank bank) {
+        super(accountNumber, branch, owner, balance, "INVESTMENT", bank);
+    }
 
     public static boolean isValidOpeningBalance(double amount) {
         return amount >= MIN_OPENING_BALANCE;
@@ -37,4 +41,5 @@ public class InvestmentAccount extends Account implements InterestBearing, Seria
             deposit(interest);
         }
     }
+
 }
