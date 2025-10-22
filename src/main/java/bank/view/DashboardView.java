@@ -1,8 +1,11 @@
+
 package bank.view;
 
 import bank.controller.DashboardController;
 import bank.model.Account;
 import bank.model.Customer;
+import bank.model.IndividualCustomer;
+import bank.model.CompanyCustomer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,6 +27,7 @@ public class DashboardView {
 
     private Label welcomeLabel;
     private Label totalBalanceLabel;
+    private Label accountCountLabel;
     private VBox accountsContainer;
     private VBox profileContainer;
     private VBox dashboardContent;
@@ -44,15 +48,12 @@ public class DashboardView {
     }
 
     private void createView() {
-        
         BorderPane mainLayout = new BorderPane();
         mainLayout.setStyle("-fx-background-color: #f7fafc;");
 
-        
         VBox leftNav = createLeftNavigation();
         mainLayout.setLeft(leftNav);
 
-        
         scrollPane = createCenterContent();
         mainLayout.setCenter(scrollPane);
 
@@ -65,7 +66,6 @@ public class DashboardView {
         leftNav.setPrefWidth(250);
         leftNav.setStyle("-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-width: 0 1px 0 0;");
 
-        
         VBox logoContainer = new VBox(10);
         logoContainer.setAlignment(Pos.CENTER);
 
@@ -78,13 +78,11 @@ public class DashboardView {
 
         logoContainer.getChildren().addAll(bankLogo, bankName);
 
-        
         welcomeLabel = new Label();
         welcomeLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         welcomeLabel.setTextFill(Color.web("#718096"));
         welcomeLabel.setWrapText(true);
 
-       
         VBox navItems = new VBox(10);
 
         Button dashboardBtn = createNavButton("📊 Dashboard", true);
@@ -95,7 +93,6 @@ public class DashboardView {
 
         navItems.getChildren().addAll(dashboardBtn, profileBtn);
 
-        
         Label quickActionsLabel = new Label("Quick Actions");
         quickActionsLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         quickActionsLabel.setTextFill(Color.web("#4A5568"));
@@ -128,7 +125,6 @@ public class DashboardView {
 
         quickActions.getChildren().addAll(openAccountBtn, depositBtn, withdrawBtn, transactionsBtn);
 
-        
         Button logoutBtn = new Button("🚪 Logout");
         logoutBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e; -fx-border-color: #e53e3e; -fx-border-radius: 8px; -fx-padding: 12px 16px; -fx-cursor: hand;");
         logoutBtn.setMaxWidth(Double.MAX_VALUE);
@@ -171,17 +167,13 @@ public class DashboardView {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setPadding(new Insets(0));
 
-        
         mainContent = new VBox();
         mainContent.setStyle("-fx-background-color: #f7fafc;");
 
-        
         dashboardContent = createDashboardContent();
 
-       
         profileContainer = createProfileContent();
 
-        
         mainContent.getChildren().add(dashboardContent);
         scrollPane.setContent(mainContent);
 
@@ -193,7 +185,6 @@ public class DashboardView {
         dashboardContent.setPadding(new Insets(20));
         dashboardContent.setStyle("-fx-background-color: #f7fafc;");
 
-        
         HBox header = new HBox();
         header.setAlignment(Pos.CENTER_LEFT);
         Label headerLabel = new Label("Dashboard Overview");
@@ -201,10 +192,8 @@ public class DashboardView {
         headerLabel.setTextFill(Color.web("#2D3748"));
         header.getChildren().add(headerLabel);
 
-        
         HBox balanceCard = createBalanceCard();
 
-        
         VBox accountsSection = createAccountsSection();
 
         dashboardContent.getChildren().addAll(header, balanceCard, accountsSection);
@@ -216,7 +205,6 @@ public class DashboardView {
         profileContent.setPadding(new Insets(20));
         profileContent.setStyle("-fx-background-color: #f7fafc;");
 
-        r
         HBox header = new HBox();
         header.setAlignment(Pos.CENTER_LEFT);
         Label headerLabel = new Label("My Profile");
@@ -224,12 +212,10 @@ public class DashboardView {
         headerLabel.setTextFill(Color.web("#2D3748"));
         header.getChildren().add(headerLabel);
 
-       
         VBox profileCard = new VBox(20);
         profileCard.setStyle("-fx-background-color: white; -fx-background-radius: 12px; -fx-border-color: #e2e8f0; -fx-border-radius: 12px; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);");
         profileCard.setPadding(new Insets(25));
 
-        
         Label loadingLabel = new Label("Loading profile information...");
         loadingLabel.setStyle("-fx-text-fill: #718096; -fx-font-size: 14px;");
         profileCard.getChildren().add(loadingLabel);
@@ -279,12 +265,12 @@ public class DashboardView {
 
         VBox accountsStat = new VBox(5);
         accountsStat.setAlignment(Pos.CENTER);
-        Label accountsCount = new Label("0");
-        accountsCount.setFont(Font.font("System", FontWeight.BOLD, 18));
+        accountCountLabel = new Label("0");
+        accountCountLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
         Label accountsLabel = new Label("Accounts");
         accountsLabel.setFont(Font.font("System", 12));
         accountsLabel.setTextFill(Color.web("#718096"));
-        accountsStat.getChildren().addAll(accountsCount, accountsLabel);
+        accountsStat.getChildren().addAll(accountCountLabel, accountsLabel);
 
         stats.getChildren().addAll(accountsStat);
 
@@ -297,14 +283,20 @@ public class DashboardView {
     private VBox createAccountsSection() {
         VBox accountsSection = new VBox(15);
 
+        HBox sectionHeader = new HBox();
+        sectionHeader.setAlignment(Pos.CENTER_LEFT);
+
         Label sectionTitle = new Label("Your Accounts");
         sectionTitle.setFont(Font.font("System", FontWeight.BOLD, 20));
         sectionTitle.setTextFill(Color.web("#2D3748"));
 
+        HBox.setHgrow(sectionTitle, Priority.ALWAYS);
+        sectionHeader.getChildren().add(sectionTitle);
+
         accountsContainer = new VBox(10);
         updateAccountsDisplay();
 
-        accountsSection.getChildren().addAll(sectionTitle, accountsContainer);
+        accountsSection.getChildren().addAll(sectionHeader, accountsContainer);
         return accountsSection;
     }
 
@@ -324,13 +316,22 @@ public class DashboardView {
             noAccountsLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
             noAccountsLabel.setTextFill(Color.web("#4A5568"));
 
-            Label noAccountsSubtitle = new Label("Open your first account to get started!");
+            Label noAccountsSubtitle = new Label("Use the 'Open Account' button in the left navigation to create your first account!");
             noAccountsSubtitle.setFont(Font.font("System", 14));
             noAccountsSubtitle.setTextFill(Color.web("#718096"));
+
+            // REMOVED: The duplicate Open Account button from here
+            // Only keep the one in the left navigation
 
             noAccountsCard.getChildren().addAll(noAccountsIcon, noAccountsLabel, noAccountsSubtitle);
             accountsContainer.getChildren().add(noAccountsCard);
         } else {
+            // Add account count
+            Label accountCount = new Label("Total Accounts: " + accounts.size());
+            accountCount.setFont(Font.font("System", FontWeight.BOLD, 14));
+            accountCount.setTextFill(Color.web("#718096"));
+            accountsContainer.getChildren().add(accountCount);
+
             for (Account account : accounts) {
                 HBox accountCard = createAccountCard(account);
                 accountsContainer.getChildren().add(accountCard);
@@ -344,7 +345,6 @@ public class DashboardView {
         accountCard.setPadding(new Insets(15));
         accountCard.setAlignment(Pos.CENTER_LEFT);
 
-       
         Label accountIcon = new Label(getAccountIcon(account.getAccountType()));
         accountIcon.setFont(Font.font(24));
         accountIcon.setTextFill(getAccountColor(account.getAccountType()));
@@ -364,7 +364,6 @@ public class DashboardView {
 
         accountInfo.getChildren().addAll(accountType, accountNumber, accountDetails);
 
-        
         Label balanceLabel = new Label(account.getFormattedBalance());
         balanceLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
         balanceLabel.setTextFill(Color.web("#2D3748"));
@@ -399,10 +398,8 @@ public class DashboardView {
         mainContent.getChildren().clear();
         mainContent.getChildren().add(dashboardContent);
 
-        
         updateNavButtons(true, false);
 
-        
         scrollPane.setVvalue(0);
 
         refresh();
@@ -411,14 +408,11 @@ public class DashboardView {
     private void showProfile() {
         showingProfile = true;
 
-        
         mainContent.getChildren().clear();
         mainContent.getChildren().add(profileContainer);
 
-        
         updateNavButtons(false, true);
 
-       
         scrollPane.setVvalue(0);
 
         refreshProfile();
@@ -446,14 +440,12 @@ public class DashboardView {
             System.out.println("👤 Refreshing profile for: " + customer.getFirstName() + " " + customer.getSurname());
             System.out.println("📧 Email: " + customer.getEmail());
             System.out.println("🏠 Address: " + customer.getAddress());
+            System.out.println("🏢 Customer Type: " + customer.getCustomerType());
 
-            
             VBox profileCard = (VBox) profileContainer.getChildren().get(1);
-
-           
             profileCard.getChildren().clear();
 
-           
+            
             VBox personalInfoSection = new VBox(15);
             Label personalTitle = new Label("👤 Personal Information");
             personalTitle.setFont(Font.font("System", FontWeight.BOLD, 18));
@@ -463,6 +455,7 @@ public class DashboardView {
             personalFields.getChildren().addAll(
                     createProfileField("Full Name", customer.getFirstName() + " " + customer.getSurname()),
                     createProfileField("Customer ID", customer.getCustomerId()),
+                    createProfileField("Customer Type", customer.getCustomerType()),
                     createProfileField("Username", customer.getUsername()),
                     createProfileField("Email", customer.getEmail()),
                     createProfileField("Address", customer.getAddress())
@@ -470,29 +463,46 @@ public class DashboardView {
 
             personalInfoSection.getChildren().addAll(personalTitle, personalFields);
 
-           
-            VBox employmentInfoSection = new VBox(15);
-            Label employmentTitle = new Label("💼 Employment Information");
-            employmentTitle.setFont(Font.font("System", FontWeight.BOLD, 18));
-            employmentTitle.setTextFill(Color.web("#2D3748"));
-
-            VBox employmentFields = new VBox(10);
-            employmentFields.getChildren().addAll(
-                    createProfileField("Employment Status", customer.getEmploymentStatus()),
-                    createProfileField("Company Name", customer.getCompanyName()),
-                    createProfileField("Company Address", customer.getCompanyAddress())
-            );
-
-            employmentInfoSection.getChildren().addAll(employmentTitle, employmentFields);
-
             
+            VBox specificInfoSection = new VBox(15);
+
+            if (customer instanceof IndividualCustomer) {
+                IndividualCustomer individual = (IndividualCustomer) customer;
+                Label specificTitle = new Label("🆔 Individual Details");
+                specificTitle.setFont(Font.font("System", FontWeight.BOLD, 18));
+                specificTitle.setTextFill(Color.web("#2D3748"));
+
+                VBox specificFields = new VBox(10);
+                specificFields.getChildren().addAll(
+                        createProfileField("ID Number", individual.getIdNumber()),
+                        createProfileField("Occupation", individual.getOccupation()),
+                        createProfileField("Employment Status", individual.getEmploymentStatus())
+                );
+                specificInfoSection.getChildren().addAll(specificTitle, specificFields);
+
+            } else if (customer instanceof CompanyCustomer) {
+                CompanyCustomer company = (CompanyCustomer) customer;
+                Label specificTitle = new Label("🏢 Company Details");
+                specificTitle.setFont(Font.font("System", FontWeight.BOLD, 18));
+                specificTitle.setTextFill(Color.web("#2D3748"));
+
+                VBox specificFields = new VBox(10);
+                specificFields.getChildren().addAll(
+                        createProfileField("Registration Number", company.getRegistrationNumber()),
+                        createProfileField("Business Type", company.getBusinessType()),
+                        createProfileField("Contact Person", company.getContactPerson()),
+                        createProfileField("Company Size", company.getCompanySize())
+                );
+                specificInfoSection.getChildren().addAll(specificTitle, specificFields);
+            }
+
             profileCard.getChildren().addAll(
                     personalInfoSection,
                     new Separator(),
-                    employmentInfoSection
+                    specificInfoSection
             );
 
-            System.out.println("✅ Profile content populated successfully with " + profileCard.getChildren().size() + " sections");
+            System.out.println("✅ Profile content populated successfully with customer type: " + customer.getCustomerType());
         } else {
             System.out.println("❌ No customer data available for profile");
             VBox profileCard = (VBox) profileContainer.getChildren().get(1);
@@ -507,10 +517,21 @@ public class DashboardView {
     public void refresh() {
         var customer = dashboardController.getCurrentCustomer();
         if (customer != null) {
-            welcomeLabel.setText("Welcome, " + customer.getFirstName() + "!");
+            welcomeLabel.setText("Welcome, " + customer.getFirstName() + "! (" + customer.getCustomerType() + ")");
+
+           
+            System.out.println("🔄 Dashboard refresh - Getting accounts for customer: " + customer.getCustomerId());
 
             List<Account> accounts = dashboardController.getCustomerAccounts();
-            totalBalanceLabel.setText(String.format("P %.2f", dashboardController.getTotalBalance()));
+            double totalBalance = dashboardController.getTotalBalance();
+
+            System.out.println("📊 Accounts retrieved: " + accounts.size());
+            for (Account account : accounts) {
+                System.out.println("   ✅ " + account.getAccountNumber() + " | " + account.getAccountType() + " | P " + account.getBalance());
+            }
+
+            totalBalanceLabel.setText(String.format("P %.2f", totalBalance));
+            accountCountLabel.setText(String.valueOf(accounts.size()));
 
             if (!showingProfile) {
                 updateAccountsDisplay();
@@ -518,15 +539,11 @@ public class DashboardView {
                 refreshProfile();
             }
 
-           
             System.out.println("=== Dashboard Refreshed ===");
-            System.out.println("👤 Customer: " + customer.getUsername() + " (ID: " + customer.getCustomerId() + ")");
-            System.out.println("💰 Total balance: P " + dashboardController.getTotalBalance());
+            System.out.println("👤 Customer: " + customer.getUsername() + " (ID: " + customer.getCustomerId() + ", Type: " + customer.getCustomerType() + ")");
+            System.out.println("💰 Total balance: P " + totalBalance);
             System.out.println("📊 Number of accounts: " + accounts.size());
 
-            for (Account account : accounts) {
-                System.out.println("   ✅ Account: " + account.getAccountNumber() + " | Type: " + account.getAccountType() + " | Balance: P " + account.getBalance());
-            }
         } else {
             System.out.println("❌ Dashboard refresh: No customer found!");
         }
