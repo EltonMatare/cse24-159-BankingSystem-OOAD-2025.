@@ -9,7 +9,9 @@ public class SavingsAccount extends Account implements InterestBearing, Serializ
     public SavingsAccount(String accountNumber, String branch, Customer owner, double balance) {
         super(accountNumber, branch, owner, balance, "SAVINGS");
     }
-
+public SavingsAccount(String accountNumber, String branch, Customer owner, double balance, Bank bank) {
+        super(accountNumber, branch, owner, balance, "SAVINGS", bank);
+    }
     @Override
     public boolean canWithdraw() {
         return false;
@@ -33,4 +35,5 @@ public class SavingsAccount extends Account implements InterestBearing, Serializ
         }
     }
 }
+
 
