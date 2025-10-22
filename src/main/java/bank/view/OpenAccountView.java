@@ -19,7 +19,7 @@ public class OpenAccountView {
 
     private String selectedAccountType;
     private TextField initialDepositField;
-    private ComboBox<String> branchCombo; 
+    private ComboBox<String> branchCombo;
     private TextField companyNameField;
     private TextArea companyAddressField;
     private Label errorLabel;
@@ -36,7 +36,7 @@ public class OpenAccountView {
     }
 
     private void createView() {
-        
+
         ScrollPane mainScrollPane = new ScrollPane();
         mainScrollPane.setFitToWidth(true);
         mainScrollPane.setPadding(new Insets(10));
@@ -45,7 +45,7 @@ public class OpenAccountView {
         mainContainer.setAlignment(Pos.TOP_CENTER);
         mainContainer.setPadding(new Insets(20));
 
-        
+
         HBox header = new HBox();
         header.setAlignment(Pos.CENTER_LEFT);
 
@@ -56,20 +56,20 @@ public class OpenAccountView {
         HBox.setHgrow(backButton, Priority.ALWAYS);
         header.getChildren().add(backButton);
 
-        
+
         Label titleLabel = new Label("Open New Account");
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 28));
         titleLabel.setTextFill(Color.web("#2D3748"));
 
-        
+
         VBox typeSelection = createAccountTypeSelection();
 
-        
+
         VBox formContainer = new VBox(15);
         formContainer.setMaxWidth(500);
         formContainer.setAlignment(Pos.TOP_CENTER);
 
-        
+
         VBox branchBox = new VBox(5);
         Label branchLabel = new Label("Branch *");
         branchLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
@@ -79,7 +79,7 @@ public class OpenAccountView {
         branchCombo.setStyle("-fx-pref-height: 40px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;");
         branchBox.getChildren().addAll(branchLabel, branchCombo);
 
-        
+
         VBox depositBox = new VBox(5);
         Label depositLabel = new Label("Initial Deposit Amount *");
         depositLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
@@ -88,7 +88,7 @@ public class OpenAccountView {
         initialDepositField.setStyle("-fx-pref-height: 40px; -fx-padding: 0 12px; -fx-background-color: white; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px; -fx-font-size: 14px;");
         depositBox.getChildren().addAll(depositLabel, initialDepositField);
 
-       
+
         employmentDetailsContainer = new VBox(10);
         employmentDetailsContainer.setVisible(false);
 
@@ -111,7 +111,7 @@ public class OpenAccountView {
 
         employmentDetailsContainer.getChildren().addAll(companyNameBox, companyAddressBox);
 
-        
+
         errorLabel = new Label();
         errorLabel.setTextFill(Color.RED);
         errorLabel.setVisible(false);
@@ -122,19 +122,19 @@ public class OpenAccountView {
         successLabel.setVisible(false);
         successLabel.setWrapText(true);
 
-        
+
         formContainer.getChildren().addAll(
                 branchBox, depositBox, employmentDetailsContainer, errorLabel, successLabel
         );
 
-       
+
         mainContainer.getChildren().addAll(
                 header, titleLabel, typeSelection, formContainer
         );
 
         mainScrollPane.setContent(mainContainer);
 
-        
+
         HBox buttonsContainer = new HBox(15);
         buttonsContainer.setAlignment(Pos.CENTER);
         buttonsContainer.setPadding(new Insets(20));
@@ -142,7 +142,7 @@ public class OpenAccountView {
 
         openAccountButton = new Button("OPEN ACCOUNT");
         openAccountButton.setStyle("-fx-pref-height: 50px; -fx-min-width: 200px; -fx-background-color: #667eea; -fx-background-radius: 8px; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-cursor: hand;");
-        openAccountButton.setDisable(true); 
+        openAccountButton.setDisable(true);
         openAccountButton.setOnAction(e -> handleOpenAccount());
 
         Button cancelButton = new Button("Cancel");
@@ -151,10 +151,10 @@ public class OpenAccountView {
 
         buttonsContainer.getChildren().addAll(openAccountButton, cancelButton);
 
-       
+
         BorderPane rootLayout = new BorderPane();
-        rootLayout.setCenter(mainScrollPane); 
-        rootLayout.setBottom(buttonsContainer); 
+        rootLayout.setCenter(mainScrollPane);
+        rootLayout.setBottom(buttonsContainer);
 
         scene = new Scene(rootLayout, 900, 600);
     }
@@ -169,7 +169,7 @@ public class OpenAccountView {
         HBox accountCards = new HBox(15);
         accountCards.setAlignment(Pos.CENTER);
 
-        
+
         VBox savingsCard = createAccountTypeCard(
                 "SAVINGS",
                 "Savings Account",
@@ -177,7 +177,7 @@ public class OpenAccountView {
                 "💰"
         );
 
-        
+
         VBox investmentCard = createAccountTypeCard(
                 "INVESTMENT",
                 "Investment Account",
@@ -185,7 +185,7 @@ public class OpenAccountView {
                 "📈"
         );
 
-       
+
         VBox chequeCard = createAccountTypeCard(
                 "CHEQUE",
                 "Cheque Account",
@@ -205,7 +205,7 @@ public class OpenAccountView {
         card.setPadding(new Insets(15));
         card.setPrefWidth(170);
 
-        
+
         card.setOnMouseClicked(e -> {
             selectAccountType(type, card);
         });
@@ -231,7 +231,7 @@ public class OpenAccountView {
     private void selectAccountType(String accountType, VBox selectedCard) {
         this.selectedAccountType = accountType;
 
-        
+
         BorderPane root = (BorderPane) scene.getRoot();
         ScrollPane scrollPane = (ScrollPane) root.getCenter();
         VBox mainContainer = (VBox) scrollPane.getContent();
@@ -252,7 +252,7 @@ public class OpenAccountView {
             }
         }
 
-        
+
         selectedCard.setStyle("-fx-background-color: #f0f4ff; -fx-background-radius: 12px; -fx-border-color: #667eea; -fx-border-width: 2px; -fx-border-radius: 12px; -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.3), 15, 0, 0, 3); -fx-cursor: hand;");
 
         onAccountTypeSelected(accountType);
@@ -265,7 +265,7 @@ public class OpenAccountView {
         boolean showEmploymentFields = "CHEQUE".equals(accountType);
         employmentDetailsContainer.setVisible(showEmploymentFields);
 
-        
+
         companyNameField.clear();
         companyAddressField.clear();
         errorLabel.setVisible(false);
@@ -307,7 +307,7 @@ public class OpenAccountView {
             }
 
             if ("INVESTMENT".equals(selectedAccountType) && initialDeposit < 500) {
-                showError("Investment account requires minimum P 500.00 opening deposit");
+                showError("❌ Investment account requires minimum P 500.00 opening deposit");
                 return;
             }
 
@@ -315,7 +315,7 @@ public class OpenAccountView {
             System.out.println("   💵 Deposit: P " + initialDeposit);
             System.out.println("   🏢 Branch: " + branch);
 
-            
+
             Account newAccount = null;
             switch (selectedAccountType) {
                 case "SAVINGS" -> {
@@ -338,13 +338,13 @@ public class OpenAccountView {
 
                 System.out.println("✅ SUCCESS: Account created - " + newAccount.getAccountNumber() + " for customer");
 
-               
+
                 clearForm();
 
-               
+
                 new Thread(() -> {
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(3000); // Show success message for 3 seconds
                         javafx.application.Platform.runLater(() -> {
                             onAccountOpened.run();
                         });
@@ -395,8 +395,8 @@ public class OpenAccountView {
         successLabel.setVisible(false);
         openAccountButton.setDisable(true);
 
-        
-                BorderPane root = (BorderPane) scene.getRoot();
+
+        BorderPane root = (BorderPane) scene.getRoot();
         ScrollPane scrollPane = (ScrollPane) root.getCenter();
         VBox mainContainer = (VBox) scrollPane.getContent();
 
